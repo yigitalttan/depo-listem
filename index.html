@@ -20,6 +20,8 @@
     --red: #ff453a;
     --blue: #0a84ff;
     --orange: #ff9f0a;
+    --purple: #bf5af2;
+    --teal: #5ac8fa;
   }
   * { 
     box-sizing: border-box; 
@@ -67,11 +69,11 @@
   .scroll-row * { touch-action: pan-x; }
   .scroll-row::-webkit-scrollbar { display: none; }
   
-  .pill-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .pill-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
-  .pill-btn.out-active { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
-  .pill-btn.bulk-unit { background: #1c2838; color: #64d2ff; border-color: #2c4466; }
-  .pill-btn.bulk-unit:active { background: #2c4466; }
+  .pill-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .pill-btn.add-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .pill-btn.out-active { background: var(--red); color: #fff; border-color: var(--red); }
+  .pill-btn.bulk-unit { background: #261b33; color: #d68fff; border-color: #4c2d6e; }
+  .pill-btn.bulk-unit:active { background: #4c2d6e; }
   .pill-btn.reset { background: transparent; color: var(--accent); border-color: var(--accent); }
   .pill-btn.wa { background: #163320; color: var(--green); border-color: #245233; }
 
@@ -83,20 +85,30 @@
   .cat-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
   /* Kartlar */
-  .content { padding: 4px 14px; }
+  .content { padding: 4px 14px; position: relative; }
   .category-title { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 8px 2px; }
   
-  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 9px; margin-bottom: 10px; transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease; }
+  .card { 
+    background: var(--card); 
+    border: 1px solid var(--card-border); 
+    border-radius: 16px; 
+    padding: 10px; 
+    display: flex; 
+    align-items: center; 
+    gap: 9px; 
+    margin-bottom: 10px; 
+    will-change: transform;
+  }
   .card.checked { opacity: 0.5; border-color: var(--green); }
   .card.out-of-stock { border-color: var(--red); background: #241616; }
 
-  /* Yukarı / Aşağı Taşıma Vurgu Animasyonu */
-  @keyframes moveFlash {
-    0% { background-color: #1c3a5e; border-color: #0a84ff; transform: scale(1.02); }
-    100% { background-color: var(--card); border-color: var(--card-border); transform: scale(1); }
-  }
-  .card.just-moved {
-    animation: moveFlash 0.65s ease-out;
+  /* Taşınan Kartın Belirgin Vurgusu */
+  .card.moving-active {
+    border-color: #3898ff;
+    background-color: #19293d;
+    box-shadow: 0 8px 22px rgba(10, 132, 255, 0.28);
+    z-index: 15;
+    position: relative;
   }
 
   .prod-img-wrap { width: 64px; height: 74px; border-radius: 10px; background: #2c2c2e; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; text-align: center; cursor: pointer; border: 1px solid #333; }
@@ -108,17 +120,25 @@
 
   .controls-row { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
   .stepper { display: flex; align-items: center; gap: 4px; }
-  .step-btn { width: 38px; height: 36px; border-radius: 9px; border: 1px solid #3a3a3c; background: var(--btn-bg); color: var(--text); font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-  .step-btn.pressing { background: #545458; transform: scale(0.95); }
-  .step-val { min-width: 34px; height: 36px; border-radius: 9px; background: #252528; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--text); padding: 0 4px; flex-shrink: 0; }
-  .step-val.has-qty { color: var(--orange); border-color: #ff9f0a66; }
+  
+  /* Renkli Artı / Eksi Butonları */
+  .step-btn { width: 38px; height: 36px; border-radius: 9px; font-size: 21px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.08s; }
+  .step-btn.minus { background: #331919; border: 1px solid #662929; color: #ff6961; }
+  .step-btn.plus { background: #163320; border: 1px solid #265c38; color: #4cd964; }
+  .step-btn.pressing { transform: scale(0.92); filter: brightness(1.3); }
 
-  .unit-badge { height: 36px; padding: 0 7px; border-radius: 9px; background: #252528; border: 1px solid #3a3a3c; color: #d1d1d6; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-  .unit-badge:active { background: #3a3a3c; }
+  .step-val { min-width: 34px; height: 36px; border-radius: 9px; background: #252528; border: 1px solid #38383c; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--text); padding: 0 4px; flex-shrink: 0; }
+  .step-val.has-qty { color: var(--orange); border-color: #ff9f0a88; background: #2b2214; }
 
-  /* Kart İçi Hızlı Yukarı / Aşağı Sıralama */
+  /* Renkli Birim Rozeti (Adet / Koli / Paket) */
+  .unit-badge { height: 36px; padding: 0 7px; border-radius: 9px; background: #261b33; border: 1px solid #4c2d6e; color: #d68fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .unit-badge.is-koli { background: #2e2112; border-color: #66461d; color: #ffb340; }
+  .unit-badge.is-paket { background: #162a33; border-color: #295266; color: #5ac8fa; }
+  .unit-badge:active { filter: brightness(1.25); }
+
+  /* Renkli Yukarı / Aşağı Sıralama Okları */
   .move-group { display: flex; gap: 3px; margin-left: 1px; flex-shrink: 0; }
-  .move-mini { width: 26px; height: 36px; border-radius: 8px; border: 1px solid #3a3a3c; background: #252528; color: #aeaeb2; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .move-mini { width: 26px; height: 36px; border-radius: 8px; border: 1px solid #294666; background: #182738; color: #5ac8fa; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .move-mini:active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
   /* Sağ Durum Butonları (Tik ve Depoda Yok X) */
@@ -189,11 +209,10 @@
   </div>
 
   <div class="scroll-row">
-    <button class="pill-btn" id="filterNeededBtn" onclick="setFilterMode('needed')">Sadece getirilecekler</button>
-    <button class="pill-btn" id="filterOutBtn" onclick="setFilterMode('out')">Depoda Yoklar</button>
+    <button class="pill-btn add-primary" onclick="openModal()">+ Ürün Ekle</button>
+    <button class="pill-btn" id="filterOutBtn" onclick="toggleOutFilter()">Depoda Yoklar</button>
     <button class="pill-btn bulk-unit" onclick="setAllUnits('Adet')">Hepsi Adet</button>
     <button class="pill-btn bulk-unit" onclick="setAllUnits('Koli')">Hepsi Koli</button>
-    <button class="pill-btn" onclick="openModal()">+ Ürün Ekle</button>
     <button class="pill-btn wa" onclick="shareWhatsApp()">WhatsApp</button>
     <button class="pill-btn" onclick="openBackupModal()">Yedek</button>
     <button class="pill-btn reset" onclick="resetList()">Yeni liste</button>
@@ -429,13 +448,13 @@
     localStorage.setItem('depo_katalog_v2', JSON.stringify(products));
   }
 
-  let filterMode = 'all';
+  let onlyOutFilter = false;
   let selectedCategory = 'TÜMÜ';
   let searchQuery = '';
   let editingId = null;
   let tempImg = null;
   let tempZoom = 1;
-  let lastMovedId = null;
+  let isAnimatingMove = false;
   const units = ['Adet', 'Koli', 'Paket'];
 
   // Arka Plan Sayfasının Kaymasını Kilitleme / Açma
@@ -486,6 +505,12 @@
                       (outCount > 0 ? ` · <span class="out-stat">Yok: <b>${outCount}</b></span>` : '');
   }
 
+  function getUnitClass(unit) {
+    if (unit === 'Koli') return 'is-koli';
+    if (unit === 'Paket') return 'is-paket';
+    return '';
+  }
+
   function render() {
     const content = document.getElementById('appContent');
     const catTabs = document.getElementById('catTabs');
@@ -499,8 +524,7 @@
     `).join('');
 
     let visible = products.filter(p => {
-      if (filterMode === 'needed' && p.qty <= 0) return false;
-      if (filterMode === 'out' && !p.outOfStock) return false;
+      if (onlyOutFilter && !p.outOfStock) return false;
       if (selectedCategory !== 'TÜMÜ' && (p.category || 'GENEL').toUpperCase() !== selectedCategory) return false;
       if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
@@ -525,9 +549,9 @@
       html += `<div class="category-title">${cat}</div>`;
       items.forEach(p => {
         const z = p.zoom || 1;
-        const flashClass = (lastMovedId === p.id) ? 'just-moved' : '';
+        const u = p.unit || 'Adet';
         html += `
-          <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''} ${flashClass}" id="card-${p.id}">
+          <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''}" id="card-${p.id}">
             <div class="prod-img-wrap" onclick="openModal('${p.id}')">
               ${p.img 
                 ? `<img src="${p.img}" style="transform: scale(${z});" onerror="this.onerror=null; this.src=''; this.alt='Hata';">` 
@@ -537,11 +561,11 @@
               <div class="prod-name" onclick="openModal('${p.id}')">${p.name}</div>
               <div class="controls-row">
                 <div class="stepper">
-                  <button class="step-btn" data-action="step" data-id="${p.id}" data-delta="-1">−</button>
+                  <button class="step-btn minus" data-action="step" data-id="${p.id}" data-delta="-1">−</button>
                   <div class="step-val ${p.qty > 0 ? 'has-qty' : ''}" id="qty-${p.id}">${p.qty}</div>
-                  <button class="step-btn" data-action="step" data-id="${p.id}" data-delta="1">+</button>
+                  <button class="step-btn plus" data-action="step" data-id="${p.id}" data-delta="1">+</button>
                 </div>
-                <button class="unit-badge" id="unit-${p.id}" data-action="unit" data-id="${p.id}">${p.unit || 'Adet'}</button>
+                <button class="unit-badge ${getUnitClass(u)}" id="unit-${p.id}" data-action="unit" data-id="${p.id}">${u}</button>
                 <div class="move-group">
                   <button class="move-mini" title="Yukarı Taşı" data-action="move" data-id="${p.id}" data-dir="-1">▲</button>
                   <button class="move-mini" title="Aşağı Taşı" data-action="move" data-id="${p.id}" data-dir="1">▼</button>
@@ -557,9 +581,6 @@
       });
     }
     content.innerHTML = html;
-    if (lastMovedId) {
-      setTimeout(() => { lastMovedId = null; }, 700);
-    }
   }
 
   // Tüm Ürünlerin Birimini Toplu Değiştirme (Hepsi Adet / Hepsi Koli)
@@ -644,14 +665,15 @@
     } else if (action === 'out') {
       toggleOut(id);
     } else if (action === 'move') {
-      moveProductInline(id, parseInt(btn.dataset.dir, 10));
+      moveProductAnimated(id, parseInt(btn.dataset.dir, 10));
     }
   });
 
   appContent.addEventListener('pointercancel', clearTimers);
 
-  // Kategori İçinde Hızlı Yukarı / Aşağı Taşıma ve Görsel Vurgu
-  function moveProductInline(id, dir) {
+  // 0.5 Saniyelik Fiziksel Yer Değiştirme (FLIP) Animasyonu
+  function moveProductAnimated(id, dir) {
+    if (isAnimatingMove) return;
     const idx = products.findIndex(x => x.id === id);
     if (idx === -1) return;
     const targetCat = (products[idx].category || 'GENEL').toUpperCase();
@@ -674,12 +696,65 @@
     }
 
     if (swapIdx === -1) return;
+
+    const swapId = products[swapIdx].id;
+    const el1 = document.getElementById(`card-${id}`);
+    const el2 = document.getElementById(`card-${swapId}`);
+
+    // İlk konumları kaydet (First)
+    const rect1First = el1 ? el1.getBoundingClientRect() : null;
+    const rect2First = el2 ? el2.getBoundingClientRect() : null;
+
+    // Dizide yer değiştir ve kaydet
     const temp = products[idx];
     products[idx] = products[swapIdx];
     products[swapIdx] = temp;
     
-    lastMovedId = id;
-    saveImmediate();
+    clearTimeout(saveTimer);
+    try {
+      localStorage.setItem('depo_katalog_v2', JSON.stringify(products));
+    } catch (e) {}
+    render();
+
+    // Yeni DOM elemanlarını bul ve fark kadar geri çekip 0.5s kaydır (Last, Invert, Play)
+    const newEl1 = document.getElementById(`card-${id}`);
+    const newEl2 = document.getElementById(`card-${swapId}`);
+
+    if (rect1First && rect2First && newEl1 && newEl2) {
+      isAnimatingMove = true;
+      const rect1Last = newEl1.getBoundingClientRect();
+      const rect2Last = newEl2.getBoundingClientRect();
+
+      const deltaY1 = rect1First.top - rect1Last.top;
+      const deltaY2 = rect2First.top - rect2Last.top;
+
+      newEl1.classList.add('moving-active');
+      newEl1.style.transition = 'none';
+      newEl2.style.transition = 'none';
+      newEl1.style.transform = `translateY(${deltaY1}px) scale(1.03)`;
+      newEl2.style.transform = `translateY(${deltaY2}px)`;
+
+      // Tarayıcıya başlangıç karesini çizdir
+      newEl1.offsetHeight;
+
+      newEl1.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.5s ease, border-color 0.5s ease';
+      newEl2.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+      newEl1.style.transform = 'translateY(0) scale(1)';
+      newEl2.style.transform = 'translateY(0)';
+
+      setTimeout(() => {
+        if (newEl1) {
+          newEl1.classList.remove('moving-active');
+          newEl1.style.transition = '';
+          newEl1.style.transform = '';
+        }
+        if (newEl2) {
+          newEl2.style.transition = '';
+          newEl2.style.transform = '';
+        }
+        isAnimatingMove = false;
+      }, 520);
+    }
   }
 
   function changeQtyFast(id, delta) {
@@ -710,7 +785,10 @@
     p.unit = units[(idx + 1) % units.length];
     
     const unitEl = document.getElementById(`unit-${id}`);
-    if (unitEl) unitEl.textContent = p.unit;
+    if (unitEl) {
+      unitEl.textContent = p.unit;
+      unitEl.className = `unit-badge ${getUnitClass(p.unit)}`;
+    }
     saveDeferred();
   }
 
@@ -744,15 +822,19 @@
     saveDeferred();
   }
 
-  function setFilterMode(mode) {
-    filterMode = (filterMode === mode) ? 'all' : mode;
-    document.getElementById('filterNeededBtn').classList.toggle('active', filterMode === 'needed');
-    document.getElementById('filterOutBtn').classList.toggle('out-active', filterMode === 'out');
+  function toggleOutFilter() {
+    onlyOutFilter = !onlyOutFilter;
+    document.getElementById('filterOutBtn').classList.toggle('out-active', onlyOutFilter);
     render();
   }
 
+  // Aynı Kategoriye Tekrar Tıklanınca TÜMÜ'ne Dön
   function selectCategory(cat) {
-    selectedCategory = cat;
+    if (selectedCategory === cat && cat !== 'TÜMÜ') {
+      selectedCategory = 'TÜMÜ';
+    } else {
+      selectedCategory = cat;
+    }
     render();
   }
 
@@ -773,8 +855,7 @@
   function resetList() {
     if (!confirm('Tüm adetler, tikler ve "Depoda Yok" işaretleri sıfırlansın mı? (Ürünler ve fotoğraflar silinmez)')) return;
     products.forEach(p => { p.qty = 0; p.checked = false; p.outOfStock = false; });
-    filterMode = 'all';
-    document.getElementById('filterNeededBtn').classList.remove('active');
+    onlyOutFilter = false;
     document.getElementById('filterOutBtn').classList.remove('out-active');
     saveImmediate();
   }
