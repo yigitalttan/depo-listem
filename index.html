@@ -31,21 +31,29 @@
     margin: 0; 
     background: var(--bg); 
     color: var(--text); 
-    padding-bottom: 100px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
     overscroll-behavior-y: none;
     -webkit-user-select: none;
     user-select: none;
   }
 
-  /* Üst Alan */
-  .header { padding: 16px 14px 10px 14px; background: rgba(18,18,18,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #252528; }
-  .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .title-area h1 { margin: 0 0 4px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  /* Üst Alan - iPhone Çentik / Dynamic Island Korumalı */
+  .header { 
+    padding: calc(14px + env(safe-area-inset-top)) 14px 10px 14px; 
+    background: rgba(18,18,18,0.95); 
+    backdrop-filter: blur(12px); 
+    position: sticky; 
+    top: 0; 
+    z-index: 20; 
+    border-bottom: 1px solid #252528; 
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .title-area h1 { margin: 0 0 3px 0; font-size: 23px; font-weight: 700; letter-spacing: -0.5px; }
   .stats { font-size: 13px; color: var(--sub); line-height: 1.4; }
   .stats b { color: #e5e5ea; font-weight: 600; }
   .stats .out-stat { color: var(--red); }
 
-  .wake-btn { background: var(--btn-bg); color: var(--sub); border: 1px solid #3a3a3c; padding: 8px 11px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .wake-btn { background: var(--btn-bg); color: var(--sub); border: 1px solid #3a3a3c; padding: 9px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; }
   .wake-btn.active { background: #332700; color: var(--orange); border-color: var(--orange); }
 
   /* Arama Kutusu */
@@ -113,7 +121,7 @@
   /* Modal */
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: none; align-items: flex-end; z-index: 50; }
   .modal.open { display: flex; }
-  .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; }
+  .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px 20px calc(24px + env(safe-area-inset-bottom)) 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; }
   .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .sheet-head h2 { margin: 0; font-size: 18px; }
   .link-btn { background: none; border: none; font-size: 16px; color: var(--blue); font-weight: 600; cursor: pointer; }
@@ -606,7 +614,6 @@
     if (idx === -1) return;
     const targetCat = (products[idx].category || 'GENEL').toUpperCase();
 
-    // Aynı kategorideki bir önceki veya bir sonraki ürünü bul
     let swapIdx = -1;
     if (dir === -1) {
       for (let i = idx - 1; i >= 0; i--) {
@@ -835,7 +842,6 @@
     const inp = document.getElementById('imgUrlInput');
     inp.focus();
     
-    // Modern Pano API
     if (navigator.clipboard && navigator.clipboard.readText) {
       try {
         const text = await navigator.clipboard.readText();
@@ -844,12 +850,9 @@
           applyImageUrl();
           return;
         }
-      } catch (err) {
-        // iOS Safari izin balonu gerekirse yedek yönteme geç
-      }
+      } catch (err) {}
     }
 
-    // Yedek execCommand yöntemi
     try {
       const ok = document.execCommand('paste');
       if (ok && inp.value.trim()) {
@@ -858,7 +861,6 @@
       }
     } catch (e) {}
 
-    // Hiçbiri doğrudan izin vermediyse kutuyu seçili hale getirip kullanıcıya bildir
     inp.select();
     inp.placeholder = 'Şimdi buraya dokunup Yapıştır deyin...';
   }
