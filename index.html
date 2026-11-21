@@ -24,7 +24,7 @@
   * { 
     box-sizing: border-box; 
     -webkit-tap-highlight-color: transparent; 
-    touch-action: manipulation;
+    touch-action: pan-y; /* Dikey kaydırmaya öncelik verir, zoomu engeller */
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; 
   }
   html, body { 
@@ -55,7 +55,7 @@
   .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #3a3a3c; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; cursor: pointer; }
 
   /* Yatay Aksiyon ve Filtre Butonları */
-  .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 2px 0; scrollbar-width: none; }
+  .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 2px 0; scrollbar-width: none; touch-action: pan-x; }
   .scroll-row::-webkit-scrollbar { display: none; }
   
   .pill-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
@@ -65,7 +65,7 @@
   .pill-btn.wa { background: #163320; color: var(--green); border-color: #245233; }
 
   /* Kategori Sekmeleri */
-  .cat-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 4px 14px; scrollbar-width: none; }
+  .cat-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 4px 14px; scrollbar-width: none; touch-action: pan-x; }
   .cat-tabs::-webkit-scrollbar { display: none; }
   .cat-tab { background: #1c1c1e; color: var(--sub); border: 1px solid #2c2c2e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .cat-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -87,7 +87,7 @@
   .controls-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .stepper { display: flex; align-items: center; gap: 5px; }
   .step-btn { width: 42px; height: 38px; border-radius: 10px; border: 1px solid #3a3a3c; background: var(--btn-bg); color: var(--text); font-size: 22px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .step-btn:active { background: #545458; transform: scale(0.95); }
+  .step-btn.pressing { background: #545458; transform: scale(0.95); }
   .step-val { min-width: 40px; height: 38px; border-radius: 10px; background: #252528; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--text); padding: 0 6px; }
   .step-val.has-qty { color: var(--orange); border-color: #ff9f0a66; }
 
@@ -223,7 +223,6 @@
 </div>
 
 <script>
-  // iOS Safari zoom engelleme (Butonlara hızlı dokunmayı engellemeden)
   document.addEventListener('gesturestart', e => e.preventDefault());
 
   // Ekran Açık Tutma (Wake Lock)
@@ -281,7 +280,6 @@
   let tempImg = null;
   const units = ['Adet', 'Koli', 'Paket'];
 
-  // Arka planda gecikmeli kayıt (Seri tıklamalarda ekranı dondurmaz)
   let saveTimer = null;
   function saveDeferred() {
     clearTimeout(saveTimer);
@@ -361,16 +359,16 @@
               <div class="prod-name" onclick="openModal('${p.id}')">${p.name}</div>
               <div class="controls-row">
                 <div class="stepper">
-                  <button class="step-btn" onpointerdown="startHold(event, '${p.id}', -1)" onpointerup="stopHold()" onpointerleave="stopHold()" onpointercancel="stopHold()">−</button>
+                  <button class="step-btn" data-action="step" data-id="${p.id}" data-delta="-1">−</button>
                   <div class="step-val ${p.qty > 0 ? 'has-qty' : ''}" id="qty-${p.id}">${p.qty}</div>
-                  <button class="step-btn" onpointerdown="startHold(event, '${p.id}', 1)" onpointerup="stopHold()" onpointerleave="stopHold()" onpointercancel="stopHold()">+</button>
+                  <button class="step-btn" data-action="step" data-id="${p.id}" data-delta="1">+</button>
                 </div>
-                <button class="unit-badge" id="unit-${p.id}" onpointerdown="cycleUnit(event, '${p.id}')">${p.unit || 'Adet'}</button>
+                <button class="unit-badge" id="unit-${p.id}" data-action="unit" data-id="${p.id}">${p.unit || 'Adet'}</button>
               </div>
             </div>
             <div class="status-col">
-              <button class="check-circle" onpointerdown="toggleCheck(event, '${p.id}')">✓</button>
-              <button class="out-btn" title="Depoda Yok" onpointerdown="toggleOut(event, '${p.id}')">✕</button>
+              <button class="check-circle" data-action="check" data-id="${p.id}">✓</button>
+              <button class="out-btn" title="Depoda Yok" data-action="out" data-id="${p.id}">✕</button>
             </div>
           </div>
         `;
@@ -379,30 +377,89 @@
     content.innerHTML = html;
   }
 
-  // Sıfır Gecikmeli Hızlı Artırma / Azaltma ve Basılı Tutma Desteği
+  // Kaydırma (Scroll) Korumalı Akıllı Dokunma Kontrolü
+  const appContent = document.getElementById('appContent');
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isScrolling = false;
+  let activeBtn = null;
   let holdTimeout = null;
   let holdInterval = null;
 
-  function startHold(e, id, delta) {
-    if (e.button !== undefined && e.button !== 0) return;
-    e.preventDefault();
-    stopHold();
-    
-    // İlk dokunuşta anında tepki ver
-    changeQtyFast(id, delta);
-
-    // Basılı tutulursa seri artırmaya başla
-    holdTimeout = setTimeout(() => {
-      holdInterval = setInterval(() => {
-        changeQtyFast(id, delta);
-      }, 90);
-    }, 350);
-  }
-
-  function stopHold() {
+  function clearTimers() {
     clearTimeout(holdTimeout);
     clearInterval(holdInterval);
+    if (activeBtn) {
+      activeBtn.classList.remove('pressing');
+      activeBtn = null;
+    }
   }
+
+  appContent.addEventListener('pointerdown', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    if (e.button !== undefined && e.button !== 0) return;
+
+    touchStartX = e.clientX;
+    touchStartY = e.clientY;
+    isScrolling = false;
+    activeBtn = btn;
+
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+
+    // Eğer + veya - butonuna basıldıysa, kaydırma olup olmadığını anlamak için 110ms bekle
+    // Basılı tutuluyorsa seri artırmaya başla
+    if (action === 'step') {
+      const delta = parseInt(btn.dataset.delta, 10);
+      btn.classList.add('pressing');
+      holdTimeout = setTimeout(() => {
+        if (!isScrolling && activeBtn === btn) {
+          changeQtyFast(id, delta);
+          holdInterval = setInterval(() => {
+            if (!isScrolling) changeQtyFast(id, delta);
+          }, 95);
+        }
+      }, 280);
+    }
+  });
+
+  appContent.addEventListener('pointermove', (e) => {
+    if (!activeBtn) return;
+    const dx = Math.abs(e.clientX - touchStartX);
+    const dy = Math.abs(e.clientY - touchStartY);
+    // Parmak 8 pikselden fazla oynadıysa kullanıcı sayfayı kaydırıyordur; işlemi iptal et
+    if (dx > 8 || dy > 8) {
+      isScrolling = true;
+      clearTimers();
+    }
+  });
+
+  appContent.addEventListener('pointerup', (e) => {
+    if (!activeBtn) return;
+    const btn = activeBtn;
+    const wasScrolling = isScrolling;
+    const wasHolding = holdInterval !== null;
+    clearTimers();
+
+    // Eğer kaydırma yapıldıysa veya zaten basılı tutularak saydırıldıysa tekil tıklamayı çalıştırma
+    if (wasScrolling || wasHolding) return;
+
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+
+    if (action === 'step') {
+      changeQtyFast(id, parseInt(btn.dataset.delta, 10));
+    } else if (action === 'unit') {
+      cycleUnit(id);
+    } else if (action === 'check') {
+      toggleCheck(id);
+    } else if (action === 'out') {
+      toggleOut(id);
+    }
+  });
+
+  appContent.addEventListener('pointercancel', clearTimers);
 
   function changeQtyFast(id, delta) {
     const p = products.find(x => x.id === id);
@@ -410,7 +467,6 @@
     p.qty = Math.max(0, p.qty + delta);
     if (p.qty === 0) p.checked = false;
 
-    // Tüm sayfayı yenilemek yerine sadece ilgili sayı kutusunu anında güncelle
     const qtyEl = document.getElementById(`qty-${id}`);
     const cardEl = document.getElementById(`card-${id}`);
     if (qtyEl) {
@@ -426,8 +482,7 @@
     saveDeferred();
   }
 
-  function cycleUnit(e, id) {
-    e.preventDefault();
+  function cycleUnit(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
     const idx = units.indexOf(p.unit || 'Adet');
@@ -438,8 +493,7 @@
     saveDeferred();
   }
 
-  function toggleCheck(e, id) {
-    e.preventDefault();
+  function toggleCheck(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
     p.checked = !p.checked;
@@ -454,8 +508,7 @@
     saveDeferred();
   }
 
-  function toggleOut(e, id) {
-    e.preventDefault();
+  function toggleOut(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
     p.outOfStock = !p.outOfStock;
