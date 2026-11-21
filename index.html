@@ -62,18 +62,22 @@
   .search-inp::placeholder { color: #636366; }
   .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #3a3a3c; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; cursor: pointer; }
 
-  /* Yatay Aksiyon ve Filtre Butonları */
-  .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 2px 0; scrollbar-width: none; touch-action: pan-x; }
+  /* Yatay Aksiyon ve Filtre Butonları - Sağa Sola Akıcı Kaydırma */
+  .scroll-row { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 2px 0; scrollbar-width: none; touch-action: pan-x; }
+  .scroll-row * { touch-action: pan-x; }
   .scroll-row::-webkit-scrollbar { display: none; }
   
   .pill-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .pill-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
   .pill-btn.out-active { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
+  .pill-btn.bulk-unit { background: #1c2838; color: #64d2ff; border-color: #2c4466; }
+  .pill-btn.bulk-unit:active { background: #2c4466; }
   .pill-btn.reset { background: transparent; color: var(--accent); border-color: var(--accent); }
   .pill-btn.wa { background: #163320; color: var(--green); border-color: #245233; }
 
   /* Kategori Sekmeleri */
-  .cat-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 4px 14px; scrollbar-width: none; touch-action: pan-x; }
+  .cat-tabs { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 8px 14px 4px 14px; scrollbar-width: none; touch-action: pan-x; }
+  .cat-tabs * { touch-action: pan-x; }
   .cat-tabs::-webkit-scrollbar { display: none; }
   .cat-tab { background: #1c1c1e; color: var(--sub); border: 1px solid #2c2c2e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .cat-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -82,9 +86,18 @@
   .content { padding: 4px 14px; }
   .category-title { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 8px 2px; }
   
-  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 9px; margin-bottom: 10px; transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease; }
   .card.checked { opacity: 0.5; border-color: var(--green); }
   .card.out-of-stock { border-color: var(--red); background: #241616; }
+
+  /* Yukarı / Aşağı Taşıma Vurgu Animasyonu */
+  @keyframes moveFlash {
+    0% { background-color: #1c3a5e; border-color: #0a84ff; transform: scale(1.02); }
+    100% { background-color: var(--card); border-color: var(--card-border); transform: scale(1); }
+  }
+  .card.just-moved {
+    animation: moveFlash 0.65s ease-out;
+  }
 
   .prod-img-wrap { width: 64px; height: 74px; border-radius: 10px; background: #2c2c2e; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; text-align: center; cursor: pointer; border: 1px solid #333; }
   .prod-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s; }
@@ -106,7 +119,7 @@
   /* Kart İçi Hızlı Yukarı / Aşağı Sıralama */
   .move-group { display: flex; gap: 3px; margin-left: 1px; flex-shrink: 0; }
   .move-mini { width: 26px; height: 36px; border-radius: 8px; border: 1px solid #3a3a3c; background: #252528; color: #aeaeb2; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
-  .move-mini:active { background: #48484a; color: #fff; }
+  .move-mini:active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
   /* Sağ Durum Butonları (Tik ve Depoda Yok X) */
   .status-col { display: flex; flex-direction: column; gap: 7px; align-items: center; flex-shrink: 0; }
@@ -118,10 +131,10 @@
 
   .empty-msg { text-align: center; color: var(--sub); margin-top: 50px; font-size: 14px; line-height: 1.5; padding: 0 20px; }
 
-  /* Modal */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: none; align-items: flex-end; z-index: 50; }
+  /* Modal - Arka Plan Kaydırma Kilidi */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: none; align-items: flex-end; z-index: 50; overscroll-behavior: contain; touch-action: none; }
   .modal.open { display: flex; }
-  .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px 20px calc(24px + env(safe-area-inset-bottom)) 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; }
+  .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px 20px calc(24px + env(safe-area-inset-bottom)) 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
   .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .sheet-head h2 { margin: 0; font-size: 18px; }
   .link-btn { background: none; border: none; font-size: 16px; color: var(--blue); font-weight: 600; cursor: pointer; }
@@ -178,6 +191,8 @@
   <div class="scroll-row">
     <button class="pill-btn" id="filterNeededBtn" onclick="setFilterMode('needed')">Sadece getirilecekler</button>
     <button class="pill-btn" id="filterOutBtn" onclick="setFilterMode('out')">Depoda Yoklar</button>
+    <button class="pill-btn bulk-unit" onclick="setAllUnits('Adet')">Hepsi Adet</button>
+    <button class="pill-btn bulk-unit" onclick="setAllUnits('Koli')">Hepsi Koli</button>
     <button class="pill-btn" onclick="openModal()">+ Ürün Ekle</button>
     <button class="pill-btn wa" onclick="shareWhatsApp()">WhatsApp</button>
     <button class="pill-btn" onclick="openBackupModal()">Yedek</button>
@@ -420,7 +435,24 @@
   let editingId = null;
   let tempImg = null;
   let tempZoom = 1;
+  let lastMovedId = null;
   const units = ['Adet', 'Koli', 'Paket'];
+
+  // Arka Plan Sayfasının Kaymasını Kilitleme / Açma
+  let lockedScrollY = 0;
+  function lockBodyScroll() {
+    lockedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.width = '100%';
+  }
+
+  function unlockBodyScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, lockedScrollY);
+  }
 
   let saveTimer = null;
   function saveDeferred() {
@@ -493,8 +525,9 @@
       html += `<div class="category-title">${cat}</div>`;
       items.forEach(p => {
         const z = p.zoom || 1;
+        const flashClass = (lastMovedId === p.id) ? 'just-moved' : '';
         html += `
-          <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''}" id="card-${p.id}">
+          <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''} ${flashClass}" id="card-${p.id}">
             <div class="prod-img-wrap" onclick="openModal('${p.id}')">
               ${p.img 
                 ? `<img src="${p.img}" style="transform: scale(${z});" onerror="this.onerror=null; this.src=''; this.alt='Hata';">` 
@@ -524,6 +557,15 @@
       });
     }
     content.innerHTML = html;
+    if (lastMovedId) {
+      setTimeout(() => { lastMovedId = null; }, 700);
+    }
+  }
+
+  // Tüm Ürünlerin Birimini Toplu Değiştirme (Hepsi Adet / Hepsi Koli)
+  function setAllUnits(targetUnit) {
+    products.forEach(p => { p.unit = targetUnit; });
+    saveImmediate();
   }
 
   // Kaydırma Korumalı Akıllı Dokunma Kontrolü
@@ -608,7 +650,7 @@
 
   appContent.addEventListener('pointercancel', clearTimers);
 
-  // Kategori İçinde Hızlı Yukarı / Aşağı Taşıma
+  // Kategori İçinde Hızlı Yukarı / Aşağı Taşıma ve Görsel Vurgu
   function moveProductInline(id, dir) {
     const idx = products.findIndex(x => x.id === id);
     if (idx === -1) return;
@@ -635,6 +677,8 @@
     const temp = products[idx];
     products[idx] = products[swapIdx];
     products[swapIdx] = temp;
+    
+    lastMovedId = id;
     saveImmediate();
   }
 
@@ -782,11 +826,13 @@
     document.getElementById('delBtn').style.display = p ? 'block' : 'none';
     
     updatePreview();
+    lockBodyScroll();
     document.getElementById('modal').classList.add('open');
   }
 
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
+    unlockBodyScroll();
   }
 
   function updatePreview() {
@@ -837,7 +883,7 @@
     window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
   }
 
-  // Sorunsuz Tek Tık Yapıştırma
+  // Tek Tıkla Panodan Yapıştır ve Ekle
   async function pasteImageUrl() {
     const inp = document.getElementById('imgUrlInput');
     inp.focus();
@@ -862,7 +908,7 @@
     } catch (e) {}
 
     inp.select();
-    inp.placeholder = 'Şimdi buraya dokunup Yapıştır deyin...';
+    inp.placeholder = 'Kutuya dokunup Yapıştır deyin...';
   }
 
   function onUrlTyped(val) {
@@ -957,8 +1003,14 @@
   }
 
   // Yedekleme İşlemleri
-  function openBackupModal() { document.getElementById('backupModal').classList.add('open'); }
-  function closeBackupModal() { document.getElementById('backupModal').classList.remove('open'); }
+  function openBackupModal() { 
+    lockBodyScroll();
+    document.getElementById('backupModal').classList.add('open'); 
+  }
+  function closeBackupModal() { 
+    document.getElementById('backupModal').classList.remove('open'); 
+    unlockBodyScroll();
+  }
 
   function exportBackup() {
     const dataStr = JSON.stringify(products);
