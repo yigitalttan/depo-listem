@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Depo Listesi">
@@ -17,69 +17,118 @@
     --sub: #8e8e93;
     --accent: #e06c53;
     --green: #32d74b;
+    --red: #ff453a;
+    --blue: #0a84ff;
+    --orange: #ff9f0a;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
-  body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+  * { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    touch-action: manipulation;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; 
+  }
+  html, body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--text); 
+    padding-bottom: 100px;
+    overscroll-behavior-y: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 
   /* Üst Alan */
-  .header { padding: 20px 16px 12px 16px; background: var(--bg); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #222; }
-  .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-  .title-area h1 { margin: 0 0 6px 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-  .stats { font-size: 14px; color: var(--sub); line-height: 1.4; }
-  .stats b { color: #d1d1d6; font-weight: 600; }
+  .header { padding: 16px 14px 10px 14px; background: rgba(18,18,18,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #252528; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .title-area h1 { margin: 0 0 4px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .stats { font-size: 13px; color: var(--sub); line-height: 1.4; }
+  .stats b { color: #e5e5ea; font-weight: 600; }
+  .stats .out-stat { color: var(--red); }
 
-  .filter-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-  .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+  .wake-btn { background: var(--btn-bg); color: var(--sub); border: 1px solid #3a3a3c; padding: 8px 11px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .wake-btn.active { background: #332700; color: var(--orange); border-color: var(--orange); }
 
-  .header-actions { display: flex; gap: 10px; margin-top: 14px; }
-  .btn-reset { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
-  .btn-add-top { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 8px 14px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  /* Arama Kutusu */
+  .search-wrap { margin-top: 10px; position: relative; }
+  .search-inp { width: 100%; background: #1c1c1e; border: 1px solid #333; color: var(--text); padding: 10px 34px 10px 12px; border-radius: 10px; font-size: 15px; -webkit-user-select: text; user-select: text; }
+  .search-inp::placeholder { color: #636366; }
+  .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #3a3a3c; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; cursor: pointer; }
 
-  /* Kategoriler ve Kartlar */
-  .content { padding: 8px 16px; }
-  .category-title { font-size: 13px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 22px 0 10px 2px; }
+  /* Yatay Aksiyon ve Filtre Butonları */
+  .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 2px 0; scrollbar-width: none; }
+  .scroll-row::-webkit-scrollbar { display: none; }
   
-  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; transition: opacity 0.2s, border-color 0.2s; }
-  .card.checked { opacity: 0.55; border-color: var(--green); }
+  .pill-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .pill-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+  .pill-btn.out-active { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
+  .pill-btn.reset { background: transparent; color: var(--accent); border-color: var(--accent); }
+  .pill-btn.wa { background: #163320; color: var(--green); border-color: #245233; }
 
-  .prod-img { width: 74px; height: 84px; border-radius: 10px; object-fit: cover; background: #2c2c2e; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; text-align: center; cursor: pointer; border: 1px solid #333; }
+  /* Kategori Sekmeleri */
+  .cat-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 4px 14px; scrollbar-width: none; }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab { background: #1c1c1e; color: var(--sub); border: 1px solid #2c2c2e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .cat-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* Kartlar */
+  .content { padding: 4px 14px; }
+  .category-title { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 8px 2px; }
+  
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; transition: opacity 0.2s, border-color 0.2s; }
+  .card.checked { opacity: 0.5; border-color: var(--green); }
+  .card.out-of-stock { border-color: var(--red); background: #241616; }
+
+  .prod-img { width: 68px; height: 78px; border-radius: 10px; object-fit: cover; background: #2c2c2e; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; text-align: center; cursor: pointer; border: 1px solid #333; }
 
   .prod-mid { flex: 1; min-width: 0; }
-  .prod-name { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .prod-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
   .card.checked .prod-name { text-decoration: line-through; color: var(--sub); }
 
-  .stepper { display: flex; align-items: center; gap: 8px; }
-  .step-btn { width: 38px; height: 34px; border-radius: 8px; border: 1px solid #3a3a3c; background: var(--btn-bg); color: var(--text); font-size: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .controls-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .stepper { display: flex; align-items: center; gap: 4px; }
+  .step-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #3a3a3c; background: var(--btn-bg); color: var(--text); font-size: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .step-btn:active { background: #48484a; }
-  .step-val { min-width: 44px; height: 34px; border-radius: 8px; background: #252528; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--text); }
-  .step-val.has-qty { color: #ff9f0a; border-color: #ff9f0a55; }
+  .step-val { min-width: 36px; height: 34px; border-radius: 8px; background: #252528; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--text); padding: 0 4px; }
+  .step-val.has-qty { color: var(--orange); border-color: #ff9f0a66; }
 
-  /* Sağ Büyük Tik Yuvarlağı */
-  .check-circle { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #48484a; background: transparent; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: transparent; transition: all 0.15s; }
+  .unit-badge { height: 34px; padding: 0 9px; border-radius: 8px; background: #252528; border: 1px solid #3a3a3c; color: #d1d1d6; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .unit-badge:active { background: #3a3a3c; }
+
+  /* Sağ Durum Butonları (Tik ve Depoda Yok X) */
+  .status-col { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; }
+  .check-circle { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #48484a; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; color: transparent; transition: all 0.15s; }
   .card.checked .check-circle { background: var(--green); border-color: var(--green); color: #000; font-weight: bold; }
 
-  .empty-msg { text-align: center; color: var(--sub); margin-top: 60px; font-size: 15px; line-height: 1.5; }
+  .out-btn { width: 34px; height: 26px; border-radius: 8px; border: 1px solid #3a3a3c; background: #252528; color: var(--sub); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .card.out-of-stock .out-btn { background: var(--red); border-color: var(--red); color: #fff; }
 
-  /* Modal (Ürün Ekle / Düzenle) */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: flex-end; z-index: 50; }
+  .empty-msg { text-align: center; color: var(--sub); margin-top: 50px; font-size: 14px; line-height: 1.5; padding: 0 20px; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: none; align-items: flex-end; z-index: 50; }
   .modal.open { display: flex; }
   .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; }
-  .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .sheet-head h2 { margin: 0; font-size: 18px; }
-  .link-btn { background: none; border: none; font-size: 16px; color: #0a84ff; font-weight: 600; cursor: pointer; }
+  .link-btn { background: none; border: none; font-size: 16px; color: var(--blue); font-weight: 600; cursor: pointer; }
 
-  .preview-area { width: 100%; height: 170px; border-radius: 12px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; }
+  .preview-area { width: 100%; height: 150px; border-radius: 12px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; }
   .preview-area img { width: 100%; height: 100%; object-fit: contain; }
   
-  .photo-row { display: flex; gap: 10px; margin-bottom: 16px; }
-  .photo-lbl { flex: 1; background: #2c2c2e; color: #0a84ff; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid #3a3a3c; }
+  .photo-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .photo-lbl { flex: 1; background: #2c2c2e; color: var(--blue); padding: 11px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid #3a3a3c; }
   input[type="file"] { display: none; }
 
-  .inp-group { margin-bottom: 14px; }
-  .inp-group label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
-  .inp-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: white; font-size: 16px; }
+  .inp-group { margin-bottom: 12px; }
+  .inp-group label { display: block; font-size: 11px; color: var(--sub); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+  .inp-group input, .inp-group select { width: 100%; padding: 11px; border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: white; font-size: 15px; -webkit-user-select: text; user-select: text; }
 
-  .del-btn { width: 100%; padding: 14px; background: #3a1c1c; color: #ff453a; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; }
+  .order-row { display: flex; gap: 10px; margin-top: 10px; }
+  .order-btn { flex: 1; padding: 12px; background: #2c2c2e; color: #fff; border: 1px solid #3a3a3c; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .del-btn { width: 100%; padding: 13px; background: #3a1c1c; color: var(--red); border: none; border-radius: 12px; font-size: 15px; font-weight: 600; margin-top: 12px; cursor: pointer; }
+
+  .backup-box { display: flex; flex-direction: column; gap: 12px; }
+  .backup-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #3a3a3c; background: #2c2c2e; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; }
 </style>
 </head>
 <body>
@@ -88,19 +137,30 @@
   <div class="header-top">
     <div class="title-area">
       <h1>Depo Listesi</h1>
-      <div class="stats" id="statsText">Getirilecek: <b>0</b> ürün · Alınan: <b>0</b></div>
+      <div class="stats" id="statsText">Getirilecek: <b>0</b> · Alınan: <b>0</b></div>
     </div>
-    <button class="filter-btn" id="filterBtn" onclick="toggleFilter()">Sadece getirilecekler</button>
+    <button class="wake-btn" id="wakeBtn" onclick="toggleWakeLock()">☀️ Ekran Açık: Kapalı</button>
   </div>
-  <div class="header-actions">
-    <button class="btn-reset" onclick="resetList()">Yeni liste</button>
-    <button class="btn-add-top" onclick="openModal()">+ Ürün Ekle / Düzenle</button>
+
+  <div class="search-wrap">
+    <input type="text" class="search-inp" id="searchInp" placeholder="Ürün ara..." oninput="onSearch()">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+
+  <div class="scroll-row">
+    <button class="pill-btn" id="filterNeededBtn" onclick="setFilterMode('needed')">Sadece getirilecekler</button>
+    <button class="pill-btn" id="filterOutBtn" onclick="setFilterMode('out')">Depoda Yoklar</button>
+    <button class="pill-btn" onclick="openModal()">+ Ürün Ekle</button>
+    <button class="pill-btn wa" onclick="shareWhatsApp()">WhatsApp</button>
+    <button class="pill-btn" onclick="openBackupModal()">Yedek</button>
+    <button class="pill-btn reset" onclick="resetList()">Yeni liste</button>
   </div>
 </div>
 
+<div class="cat-tabs" id="catTabs"></div>
 <div class="content" id="appContent"></div>
 
-<!-- Ekleme / Düzenleme Penceresi -->
+<!-- Ürün Ekle / Düzenle Modal -->
 <div class="modal" id="modal">
   <div class="sheet">
     <div class="sheet-head">
@@ -116,38 +176,124 @@
     </div>
 
     <div class="inp-group">
-      <label>Kategori (Örn: KOLA, SPRİTE, FANTA)</label>
-      <input type="text" id="catInput" placeholder="KOLA, SPRİTE, FANTA" list="catSuggestions">
+      <label>Kategori</label>
+      <input type="text" id="catInput" placeholder="Örn: KOLA, SPRİTE, FANTA" list="catSuggestions">
       <datalist id="catSuggestions"></datalist>
     </div>
 
     <div class="inp-group">
-      <label>Ürün Adı (Örn: Coca-Cola 2,5 L)</label>
-      <input type="text" id="nameInput" placeholder="Ürün adını yazın">
+      <label>Ürün Adı</label>
+      <input type="text" id="nameInput" placeholder="Örn: Coca-Cola 2,5 L">
+    </div>
+
+    <div class="inp-group">
+      <label>Varsayılan Birim</label>
+      <select id="unitInput">
+        <option value="Adet">Adet</option>
+        <option value="Koli">Koli</option>
+        <option value="Paket">Paket</option>
+      </select>
+    </div>
+
+    <div class="order-row" id="orderRow" style="display:none;">
+      <button class="order-btn" onclick="moveProduct(-1)">⬆️ Listede Yukarı Taşı</button>
+      <button class="order-btn" onclick="moveProduct(1)">⬇️ Aşağı Taşı</button>
     </div>
 
     <button class="del-btn" id="delBtn" onclick="deleteProduct()" style="display:none;">Bu Ürünü Sil</button>
   </div>
 </div>
 
+<!-- Yedekleme Modal -->
+<div class="modal" id="backupModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <button class="link-btn" style="color:var(--sub)" onclick="closeBackupModal()">Kapat</button>
+      <h2>Yedekleme</h2>
+      <span style="width:40px"></span>
+    </div>
+    <p style="font-size:13px; color:var(--sub); margin-top:0; line-height:1.5;">
+      Tüm ürünlerinizi ve fotoğraflarınızı tek bir dosya olarak telefonunuza indirebilir veya daha önce aldığınız yedeği geri yükleyebilirsiniz.
+    </p>
+    <div class="backup-box">
+      <button class="backup-btn" style="background:var(--blue); border-color:var(--blue);" onclick="exportBackup()">⬇️ Yedeği İndir (Dosya Olarak Kaydet)</button>
+      <label class="backup-btn">⬆️ Yedekten Geri Yükle<input type="file" accept=".json" onchange="importBackup(event)"></label>
+    </div>
+  </div>
+</div>
+
 <script>
+  // iOS Safari çift dokunma ve parmakla zoom engelleme
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) event.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+  document.addEventListener('gesturestart', e => e.preventDefault());
+
+  // Ekran Açık Tutma (Wake Lock)
+  let wakeLock = null;
+  let isWakeActive = false;
+
+  async function toggleWakeLock() {
+    const btn = document.getElementById('wakeBtn');
+    if (!isWakeActive) {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+        isWakeActive = true;
+        btn.classList.add('active');
+        btn.innerText = '☀️ Ekran Açık: Açık';
+      } catch (err) {
+        alert('Tarayıcınız ekran açık tutma özelliğini kısıtlıyor.');
+      }
+    } else {
+      if (wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+      }
+      isWakeActive = false;
+      btn.classList.remove('active');
+      btn.innerText = '☀️ Ekran Açık: Kapalı';
+    }
+  }
+
+  document.addEventListener('visibilitychange', async () => {
+    if (isWakeActive && document.visibilityState === 'visible' && 'wakeLock' in navigator) {
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+    }
+  });
+
+  // Veri Yapısı (Mevcut v2 verilerini korur ve yeni alanları uyarlar)
   const defaultProducts = [
-    { id: '1', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola 2,5 L', qty: 0, checked: false, img: null },
-    { id: '2', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite 2,5 L', qty: 0, checked: false, img: null },
-    { id: '3', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 2,5 L', qty: 0, checked: false, img: null },
-    { id: '4', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola PET 450 ml', qty: 0, checked: false, img: null }
+    { id: '1', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola 2,5 L', qty: 0, unit: 'Koli', checked: false, outOfStock: false, img: null },
+    { id: '2', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite 2,5 L', qty: 0, unit: 'Koli', checked: false, outOfStock: false, img: null },
+    { id: '3', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 2,5 L', qty: 0, unit: 'Koli', checked: false, outOfStock: false, img: null },
+    { id: '4', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola PET 450 ml', qty: 0, unit: 'Paket', checked: false, outOfStock: false, img: null }
   ];
 
   let products = JSON.parse(localStorage.getItem('depo_katalog_v2')) || defaultProducts;
-  let onlyNeeded = false;
+  // Eski kayıtlara yeni alanları ekle
+  products = products.map(p => ({
+    unit: 'Adet',
+    outOfStock: false,
+    ...p
+  }));
+
+  let filterMode = 'all'; // 'all', 'needed', 'out'
+  let selectedCategory = 'TÜMÜ';
+  let searchQuery = '';
   let editingId = null;
   let tempImg = null;
+  const units = ['Adet', 'Koli', 'Paket'];
 
   function save() {
     try {
       localStorage.setItem('depo_katalog_v2', JSON.stringify(products));
     } catch (e) {
-      alert('Telefon hafızası doldu! Lütfen daha az veya küçük fotoğraflar kullanın.');
+      alert('Telefon hafızası doldu! Lütfen Yedek alıp eski veya gereksiz ürünleri silin.');
     }
     render();
   }
@@ -155,23 +301,41 @@
   function render() {
     const content = document.getElementById('appContent');
     const stats = document.getElementById('statsText');
+    const catTabs = document.getElementById('catTabs');
     
     const toBringCount = products.filter(p => p.qty > 0).length;
     const checkedCount = products.filter(p => p.qty > 0 && p.checked).length;
-    stats.innerHTML = `Getirilecek: <b>${toBringCount}</b> ürün · Alınan: <b>${checkedCount}</b>`;
+    const outCount = products.filter(p => p.outOfStock).length;
+    
+    stats.innerHTML = `Getirilecek: <b>${toBringCount}</b> · Alınan: <b>${checkedCount}</b>` + 
+                      (outCount > 0 ? ` · <span class="out-stat">Yok: <b>${outCount}</b></span>` : '');
 
-    const visibleProducts = onlyNeeded ? products.filter(p => p.qty > 0) : products;
+    // Kategori sekmelerini oluştur
+    const allCats = ['TÜMÜ', ...new Set(products.map(p => (p.category || 'GENEL').toUpperCase()))];
+    if (!allCats.includes(selectedCategory)) selectedCategory = 'TÜMÜ';
+    
+    catTabs.innerHTML = allCats.map(c => `
+      <button class="cat-tab ${selectedCategory === c ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</button>
+    `).join('');
 
-    if (visibleProducts.length === 0) {
-      content.innerHTML = onlyNeeded 
-        ? '<div class="empty-msg">Şu an getirilecek ürün seçilmedi.<br>Tüm ürünleri görmek için sağ üstteki butona tekrar basın.</div>'
-        : '<div class="empty-msg">Henüz ürün yok. Üstteki <b>+ Ürün Ekle</b> butonundan ürünlerinizi ekleyin.</div>';
+    // Filtreleme
+    let visible = products.filter(p => {
+      if (filterMode === 'needed' && p.qty <= 0) return false;
+      if (filterMode === 'out' && !p.outOfStock) return false;
+      if (selectedCategory !== 'TÜMÜ' && (p.category || 'GENEL').toUpperCase() !== selectedCategory) return false;
+      if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+    });
+
+    if (visible.length === 0) {
+      let msg = 'Aramanıza veya seçili filtreye uygun ürün bulunamadı.';
+      if (products.length === 0) msg = 'Henüz ürün yok. Üstteki <b>+ Ürün Ekle</b> butonundan ürünlerinizi ekleyin.';
+      content.innerHTML = `<div class="empty-msg">${msg}</div>`;
       return;
     }
 
-    // Kategorilere göre grupla
     const groups = {};
-    visibleProducts.forEach(p => {
+    visible.forEach(p => {
       const cat = (p.category || 'GENEL').toUpperCase();
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(p);
@@ -182,19 +346,25 @@
       html += `<div class="category-title">${cat}</div>`;
       items.forEach(p => {
         html += `
-          <div class="card ${p.checked ? 'checked' : ''}">
+          <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''}">
             ${p.img 
               ? `<img class="prod-img" src="${p.img}" onclick="openModal('${p.id}')">` 
               : `<div class="prod-img" onclick="openModal('${p.id}')">Fotoğraf<br>Ekle</div>`}
             <div class="prod-mid">
               <div class="prod-name" onclick="openModal('${p.id}')">${p.name}</div>
-              <div class="stepper">
-                <button class="step-btn" onclick="changeQty('${p.id}', -1)">−</button>
-                <div class="step-val ${p.qty > 0 ? 'has-qty' : ''}">${p.qty}</div>
-                <button class="step-btn" onclick="changeQty('${p.id}', 1)">+</button>
+              <div class="controls-row">
+                <div class="stepper">
+                  <button class="step-btn" onclick="changeQty('${p.id}', -1)">−</button>
+                  <div class="step-val ${p.qty > 0 ? 'has-qty' : ''}">${p.qty}</div>
+                  <button class="step-btn" onclick="changeQty('${p.id}', 1)">+</button>
+                </div>
+                <button class="unit-badge" onclick="cycleUnit('${p.id}')">${p.unit || 'Adet'}</button>
               </div>
             </div>
-            <button class="check-circle" onclick="toggleCheck('${p.id}')">✓</button>
+            <div class="status-col">
+              <button class="check-circle" onclick="toggleCheck('${p.id}')">✓</button>
+              <button class="out-btn" title="Depoda Yok" onclick="toggleOut('${p.id}')">✕</button>
+            </div>
           </div>
         `;
       });
@@ -210,41 +380,108 @@
     save();
   }
 
+  function cycleUnit(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    const idx = units.indexOf(p.unit || 'Adet');
+    p.unit = units[(idx + 1) % units.length];
+    save();
+  }
+
   function toggleCheck(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
     p.checked = !p.checked;
+    if (p.checked) p.outOfStock = false;
     save();
   }
 
-  function toggleFilter() {
-    onlyNeeded = !onlyNeeded;
-    const btn = document.getElementById('filterBtn');
-    btn.classList.toggle('active', onlyNeeded);
+  function toggleOut(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    p.outOfStock = !p.outOfStock;
+    if (p.outOfStock) p.checked = false;
+    save();
+  }
+
+  function setFilterMode(mode) {
+    filterMode = (filterMode === mode) ? 'all' : mode;
+    document.getElementById('filterNeededBtn').classList.toggle('active', filterMode === 'needed');
+    document.getElementById('filterOutBtn').classList.toggle('out-active', filterMode === 'out');
+    render();
+  }
+
+  function selectCategory(cat) {
+    selectedCategory = cat;
+    render();
+  }
+
+  function onSearch() {
+    const inp = document.getElementById('searchInp');
+    searchQuery = inp.value.trim();
+    document.getElementById('searchClear').style.display = searchQuery ? 'flex' : 'none';
+    render();
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInp').value = '';
+    searchQuery = '';
+    document.getElementById('searchClear').style.display = 'none';
     render();
   }
 
   function resetList() {
-    if (!confirm('Tüm adetler ve tikler sıfırlanıp yeni liste başlatılsın mı? (Ürünler ve fotoğraflar silinmez)')) return;
-    products.forEach(p => { p.qty = 0; p.checked = false; });
-    onlyNeeded = false;
-    document.getElementById('filterBtn').classList.remove('active');
+    if (!confirm('Tüm adetler, tikler ve "Depoda Yok" işaretleri sıfırlansın mı? (Ürünler ve fotoğraflar silinmez)')) return;
+    products.forEach(p => { p.qty = 0; p.checked = false; p.outOfStock = false; });
+    filterMode = 'all';
+    document.getElementById('filterNeededBtn').classList.remove('active');
+    document.getElementById('filterOutBtn').classList.remove('out-active');
     save();
   }
 
+  function shareWhatsApp() {
+    const toBring = products.filter(p => p.qty > 0 && !p.checked && !p.outOfStock);
+    const outItems = products.filter(p => p.outOfStock);
+
+    if (toBring.length === 0 && outItems.length === 0) {
+      alert('Paylaşılacak getirilecek ürün veya depoda yok kaydı bulunmuyor.');
+      return;
+    }
+
+    let text = '📦 *DEPO LİSTESİ*\n\n';
+    if (toBring.length > 0) {
+      text += '*Getirilecekler:*\n';
+      toBring.forEach(p => {
+        text += `• ${p.name} — *${p.qty} ${p.unit || 'Adet'}*\n`;
+      });
+    }
+    if (outItems.length > 0) {
+      text += '\n❌ *Depoda Tükenenler (Sipariş):*\n';
+      outItems.forEach(p => {
+        text += `• ${p.name}\n`;
+      });
+    }
+
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
+  // Modal İşlemleri
   function openModal(id = null) {
     editingId = id;
     const p = id ? products.find(x => x.id === id) : null;
     
-    // Mevcut kategorileri öneri olarak doldur
     const cats = [...new Set(products.map(x => x.category).filter(Boolean))];
     document.getElementById('catSuggestions').innerHTML = cats.map(c => `<option value="${c}">`).join('');
 
     document.getElementById('modalTitle').innerText = p ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle';
-    document.getElementById('catInput').value = p ? p.category : (cats[0] || '');
+    document.getElementById('catInput').value = p ? p.category : (selectedCategory !== 'TÜMÜ' ? selectedCategory : (cats[0] || ''));
     document.getElementById('nameInput').value = p ? p.name : '';
+    document.getElementById('unitInput').value = p ? (p.unit || 'Adet') : 'Adet';
     tempImg = p ? p.img : null;
+    
     document.getElementById('delBtn').style.display = p ? 'block' : 'none';
+    document.getElementById('orderRow').style.display = p ? 'flex' : 'none';
     
     updatePreview();
     document.getElementById('modal').classList.add('open');
@@ -267,13 +504,13 @@
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const max = 350;
+        const max = 320;
         let w = img.width, h = img.height;
         if (w > h && w > max) { h *= max / w; w = max; }
         else if (h > max) { w *= max / h; h = max; }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        tempImg = canvas.toDataURL('image/jpeg', 0.65);
+        tempImg = canvas.toDataURL('image/jpeg', 0.6);
         updatePreview();
       };
       img.src = ev.target.result;
@@ -284,12 +521,14 @@
   function saveProduct() {
     const cat = document.getElementById('catInput').value.trim() || 'GENEL';
     const name = document.getElementById('nameInput').value.trim();
+    const unit = document.getElementById('unitInput').value;
     if (!name) { alert('Lütfen ürün adını yazın.'); return; }
 
     if (editingId) {
       const p = products.find(x => x.id === editingId);
       p.category = cat;
       p.name = name;
+      p.unit = unit;
       p.img = tempImg;
     } else {
       products.push({
@@ -297,7 +536,9 @@
         category: cat,
         name: name,
         qty: 0,
+        unit: unit,
         checked: false,
+        outOfStock: false,
         img: tempImg
       });
     }
@@ -305,11 +546,60 @@
     closeModal();
   }
 
+  function moveProduct(dir) {
+    const idx = products.findIndex(x => x.id === editingId);
+    if (idx === -1) return;
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= products.length) return;
+    const temp = products[idx];
+    products[idx] = products[newIdx];
+    products[newIdx] = temp;
+    save();
+  }
+
   function deleteProduct() {
     if (!confirm('Bu ürünü katalogdan tamamen silmek istediğinize emin misiniz?')) return;
     products = products.filter(x => x.id !== editingId);
     save();
     closeModal();
+  }
+
+  // Yedekleme İşlemleri
+  function openBackupModal() { document.getElementById('backupModal').classList.add('open'); }
+  function closeBackupModal() { document.getElementById('backupModal').classList.remove('open'); }
+
+  function exportBackup() {
+    const dataStr = JSON.stringify(products);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `depo-yedek-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackup(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (Array.isArray(imported)) {
+          products = imported;
+          save();
+          closeBackupModal();
+          alert('Yedek başarıyla geri yüklendi!');
+        } else {
+          alert('Geçersiz yedek dosyası.');
+        }
+      } catch (err) {
+        alert('Dosya okunamadı.');
+      }
+    };
+    reader.readAsText(file);
   }
 
   render();
