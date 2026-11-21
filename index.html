@@ -4,205 +4,311 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Depo Listem">
-<title>Depo Listem</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Depo Listesi">
+<title>Depo Listesi</title>
 <style>
-  :root { --bg: #f2f2f7; --card: #ffffff; --primary: #007aff; --green: #34c759; --red: #ff3b30; --text: #1c1c1e; --sub: #8e8e93; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  :root {
+    --bg: #121212;
+    --card: #1c1c1e;
+    --card-border: #2c2c2e;
+    --btn-bg: #2c2c2e;
+    --text: #ffffff;
+    --sub: #8e8e93;
+    --accent: #e06c53;
+    --green: #32d74b;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
   body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
-  header { position: sticky; top: 0; background: rgba(242,242,247,0.9); backdrop-filter: blur(10px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5ea; z-index: 10; }
-  header h1 { margin: 0; font-size: 24px; font-weight: 700; }
-  .btn-clear { background: none; border: none; color: var(--red); font-size: 15px; font-weight: 600; cursor: pointer; display: none; }
-  .list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .empty { text-align: center; color: var(--sub); margin-top: 80px; padding: 0 30px; }
-  .item { background: var(--card); border-radius: 14px; padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: opacity 0.2s; }
-  .item.done { opacity: 0.55; }
-  .check { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #c7c7cc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; font-size: 18px; color: white; }
-  .item.done .check { background: var(--green); border-color: var(--green); }
-  .thumb { width: 58px; height: 58px; border-radius: 10px; object-fit: cover; background: #e5e5ea; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 12px; }
-  .info { flex: 1; min-width: 0; cursor: pointer; }
-  .name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item.done .name { text-decoration: line-through; color: var(--sub); }
-  .hint { font-size: 12px; color: var(--sub); margin-top: 3px; }
-  .badge { background: #e5f1ff; color: var(--primary); font-weight: 700; font-size: 14px; padding: 6px 12px; border-radius: 20px; flex-shrink: 0; }
-  .item.done .badge { background: #e5e5ea; color: var(--sub); }
-  .fab { position: fixed; bottom: 25px; right: 20px; width: 60px; height: 60px; border-radius: 30px; background: var(--primary); color: white; border: none; font-size: 32px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  /* Üst Alan */
+  .header { padding: 20px 16px 12px 16px; background: var(--bg); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #222; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .title-area h1 { margin: 0 0 6px 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .stats { font-size: 14px; color: var(--sub); line-height: 1.4; }
+  .stats b { color: #d1d1d6; font-weight: 600; }
+
+  .filter-btn { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+
+  .header-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-reset { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-add-top { background: var(--btn-bg); color: var(--text); border: 1px solid #3a3a3c; padding: 8px 14px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+
+  /* Kategoriler ve Kartlar */
+  .content { padding: 8px 16px; }
+  .category-title { font-size: 13px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 22px 0 10px 2px; }
   
-  /* Modal */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: flex-end; z-index: 20; }
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; transition: opacity 0.2s, border-color 0.2s; }
+  .card.checked { opacity: 0.55; border-color: var(--green); }
+
+  .prod-img { width: 74px; height: 84px; border-radius: 10px; object-fit: cover; background: #2c2c2e; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 11px; text-align: center; cursor: pointer; border: 1px solid #333; }
+
+  .prod-mid { flex: 1; min-width: 0; }
+  .prod-name { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .card.checked .prod-name { text-decoration: line-through; color: var(--sub); }
+
+  .stepper { display: flex; align-items: center; gap: 8px; }
+  .step-btn { width: 38px; height: 34px; border-radius: 8px; border: 1px solid #3a3a3c; background: var(--btn-bg); color: var(--text); font-size: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .step-btn:active { background: #48484a; }
+  .step-val { min-width: 44px; height: 34px; border-radius: 8px; background: #252528; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--text); }
+  .step-val.has-qty { color: #ff9f0a; border-color: #ff9f0a55; }
+
+  /* Sağ Büyük Tik Yuvarlağı */
+  .check-circle { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #48484a; background: transparent; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: transparent; transition: all 0.15s; }
+  .card.checked .check-circle { background: var(--green); border-color: var(--green); color: #000; font-weight: bold; }
+
+  .empty-msg { text-align: center; color: var(--sub); margin-top: 60px; font-size: 15px; line-height: 1.5; }
+
+  /* Modal (Ürün Ekle / Düzenle) */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: flex-end; z-index: 50; }
   .modal.open { display: flex; }
-  .sheet { background: var(--card); width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; }
-  .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .sheet-header h2 { margin: 0; font-size: 18px; }
-  .btn-text { background: none; border: none; font-size: 16px; color: var(--primary); font-weight: 600; cursor: pointer; }
-  .img-preview { width: 100%; height: 180px; border-radius: 12px; background: #f2f2f7; object-fit: contain; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; }
-  .img-preview img { width: 100%; height: 100%; object-fit: cover; }
-  .photo-btns { display: flex; gap: 10px; margin-bottom: 16px; }
-  .photo-btn { flex: 1; background: #e5f1ff; color: var(--primary); padding: 12px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 15px; cursor: pointer; }
+  .sheet { background: #1c1c1e; width: 100%; border-radius: 22px 22px 0 0; padding: 20px; border-top: 1px solid #333; max-height: 92vh; overflow-y: auto; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .sheet-head h2 { margin: 0; font-size: 18px; }
+  .link-btn { background: none; border: none; font-size: 16px; color: #0a84ff; font-weight: 600; cursor: pointer; }
+
+  .preview-area { width: 100%; height: 170px; border-radius: 12px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; }
+  .preview-area img { width: 100%; height: 100%; object-fit: contain; }
+  
+  .photo-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .photo-lbl { flex: 1; background: #2c2c2e; color: #0a84ff; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid #3a3a3c; }
   input[type="file"] { display: none; }
-  .field { margin-bottom: 16px; }
-  .field label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 6px; font-weight: 600; }
-  .field input[type="text"] { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; }
-  .qty-box { display: flex; align-items: center; justify-content: space-between; background: #f2f2f7; padding: 8px 14px; border-radius: 10px; }
-  .qty-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: white; font-size: 20px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; }
-  .qty-val { font-size: 18px; font-weight: 700; }
-  .btn-delete { width: 100%; padding: 14px; background: #ffe5e5; color: var(--red); border: none; border-radius: 12px; font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; display: none; }
+
+  .inp-group { margin-bottom: 14px; }
+  .inp-group label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+  .inp-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: white; font-size: 16px; }
+
+  .del-btn { width: 100%; padding: 14px; background: #3a1c1c; color: #ff453a; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Depo Listem</h1>
-  <button class="btn-clear" id="clearBtn" onclick="clearDone()">Alınanları Sil</button>
-</header>
+<div class="header">
+  <div class="header-top">
+    <div class="title-area">
+      <h1>Depo Listesi</h1>
+      <div class="stats" id="statsText">Getirilecek: <b>0</b> ürün · Alınan: <b>0</b></div>
+    </div>
+    <button class="filter-btn" id="filterBtn" onclick="toggleFilter()">Sadece getirilecekler</button>
+  </div>
+  <div class="header-actions">
+    <button class="btn-reset" onclick="resetList()">Yeni liste</button>
+    <button class="btn-add-top" onclick="openModal()">+ Ürün Ekle / Düzenle</button>
+  </div>
+</div>
 
-<div class="list" id="list"></div>
-<button class="fab" onclick="openModal()">+</button>
+<div class="content" id="appContent"></div>
 
+<!-- Ekleme / Düzenleme Penceresi -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <div class="sheet-header">
-      <button class="btn-text" style="color:var(--sub)" onclick="closeModal()">İptal</button>
-      <h2 id="modalTitle">Yeni Ürün</h2>
-      <button class="btn-text" onclick="saveItem()">Kaydet</button>
+    <div class="sheet-head">
+      <button class="link-btn" style="color:var(--sub)" onclick="closeModal()">İptal</button>
+      <h2 id="modalTitle">Ürün Ekle</h2>
+      <button class="link-btn" onclick="saveProduct()">Kaydet</button>
     </div>
 
-    <div class="img-preview" id="previewBox">Fotoğraf Yok</div>
-    
-    <div class="photo-btns">
-      <label class="photo-btn">📷 Kamera<input type="file" accept="image/*" capture="environment" onchange="handleImage(event)"></label>
-      <label class="photo-btn">🖼️ Galeri<input type="file" accept="image/*" onchange="handleImage(event)"></label>
+    <div class="preview-area" id="imgPreview">Fotoğraf Seçilmedi</div>
+    <div class="photo-row">
+      <label class="photo-lbl">📷 Kamerayla Çek<input type="file" accept="image/*" capture="environment" onchange="processImg(event)"></label>
+      <label class="photo-lbl">🖼️ Galeriden Seç<input type="file" accept="image/*" onchange="processImg(event)"></label>
     </div>
 
-    <div class="field">
-      <label>ÜRÜN ADI</label>
-      <input type="text" id="itemName" placeholder="Örn: Kutu Kola 330ml">
+    <div class="inp-group">
+      <label>Kategori (Örn: KOLA, SPRİTE, FANTA)</label>
+      <input type="text" id="catInput" placeholder="KOLA, SPRİTE, FANTA" list="catSuggestions">
+      <datalist id="catSuggestions"></datalist>
     </div>
 
-    <div class="field">
-      <label>İHTİYAÇ ADEDİ</label>
-      <div class="qty-box">
-        <button class="qty-btn" onclick="changeQty(-1)">-</button>
-        <span class="qty-val" id="qtyVal">1</span>
-        <button class="qty-btn" onclick="changeQty(1)">+</button>
-      </div>
+    <div class="inp-group">
+      <label>Ürün Adı (Örn: Coca-Cola 2,5 L)</label>
+      <input type="text" id="nameInput" placeholder="Ürün adını yazın">
     </div>
 
-    <button class="btn-delete" id="deleteBtn" onclick="deleteCurrent()">Ürünü Sil</button>
+    <button class="del-btn" id="delBtn" onclick="deleteProduct()" style="display:none;">Bu Ürünü Sil</button>
   </div>
 </div>
 
 <script>
-  let items = JSON.parse(localStorage.getItem('depo_listem_v1') || '[]');
-  let editId = null;
-  let currentImg = null;
-  let currentQty = 1;
+  const defaultProducts = [
+    { id: '1', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola 2,5 L', qty: 0, checked: false, img: null },
+    { id: '2', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite 2,5 L', qty: 0, checked: false, img: null },
+    { id: '3', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 2,5 L', qty: 0, checked: false, img: null },
+    { id: '4', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola PET 450 ml', qty: 0, checked: false, img: null }
+  ];
 
-  function render() {
-    const list = document.getElementById('list');
-    const clearBtn = document.getElementById('clearBtn');
-    items.sort((a, b) => a.done - b.done);
-    
-    clearBtn.style.display = items.some(i => i.done) ? 'block' : 'none';
+  let products = JSON.parse(localStorage.getItem('depo_katalog_v2')) || defaultProducts;
+  let onlyNeeded = false;
+  let editingId = null;
+  let tempImg = null;
 
-    if (items.length === 0) {
-      list.innerHTML = '<div class="empty"><h3>Liste Boş</h3><p>Depodan getirilecek ürünleri fotoğraf ve adet bilgisiyle eklemek için sağ alttaki <b>+</b> butonuna dokunun.</p></div>';
-      return;
+  function save() {
+    try {
+      localStorage.setItem('depo_katalog_v2', JSON.stringify(products));
+    } catch (e) {
+      alert('Telefon hafızası doldu! Lütfen daha az veya küçük fotoğraflar kullanın.');
     }
-
-    list.innerHTML = items.map(item => `
-      <div class="item ${item.done ? 'done' : ''}">
-        <div class="check" onclick="toggleDone('${item.id}')">${item.done ? '✓' : ''}</div>
-        ${item.img ? `<img class="thumb" src="${item.img}" onclick="openModal('${item.id}')">` : `<div class="thumb" onclick="openModal('${item.id}')">Görsel</div>`}
-        <div class="info" onclick="openModal('${item.id}')">
-          <div class="name">${item.name || 'İsimsiz Ürün'}</div>
-          <div class="hint">Düzenlemek için dokun</div>
-        </div>
-        <div class="badge">${item.qty} Adet</div>
-      </div>
-    `).join('');
-  }
-
-  function saveToStorage() {
-    try { localStorage.setItem('depo_listem_v1', JSON.stringify(items)); }
-    catch(e) { alert('Hafıza doldu! Lütfen alınan eski ürünleri silin.'); }
     render();
   }
 
-  function toggleDone(id) {
-    const item = items.find(i => i.id === id);
-    if (item) { item.done = !item.done; saveToStorage(); }
+  function render() {
+    const content = document.getElementById('appContent');
+    const stats = document.getElementById('statsText');
+    
+    const toBringCount = products.filter(p => p.qty > 0).length;
+    const checkedCount = products.filter(p => p.qty > 0 && p.checked).length;
+    stats.innerHTML = `Getirilecek: <b>${toBringCount}</b> ürün · Alınan: <b>${checkedCount}</b>`;
+
+    const visibleProducts = onlyNeeded ? products.filter(p => p.qty > 0) : products;
+
+    if (visibleProducts.length === 0) {
+      content.innerHTML = onlyNeeded 
+        ? '<div class="empty-msg">Şu an getirilecek ürün seçilmedi.<br>Tüm ürünleri görmek için sağ üstteki butona tekrar basın.</div>'
+        : '<div class="empty-msg">Henüz ürün yok. Üstteki <b>+ Ürün Ekle</b> butonundan ürünlerinizi ekleyin.</div>';
+      return;
+    }
+
+    // Kategorilere göre grupla
+    const groups = {};
+    visibleProducts.forEach(p => {
+      const cat = (p.category || 'GENEL').toUpperCase();
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(p);
+    });
+
+    let html = '';
+    for (const [cat, items] of Object.entries(groups)) {
+      html += `<div class="category-title">${cat}</div>`;
+      items.forEach(p => {
+        html += `
+          <div class="card ${p.checked ? 'checked' : ''}">
+            ${p.img 
+              ? `<img class="prod-img" src="${p.img}" onclick="openModal('${p.id}')">` 
+              : `<div class="prod-img" onclick="openModal('${p.id}')">Fotoğraf<br>Ekle</div>`}
+            <div class="prod-mid">
+              <div class="prod-name" onclick="openModal('${p.id}')">${p.name}</div>
+              <div class="stepper">
+                <button class="step-btn" onclick="changeQty('${p.id}', -1)">−</button>
+                <div class="step-val ${p.qty > 0 ? 'has-qty' : ''}">${p.qty}</div>
+                <button class="step-btn" onclick="changeQty('${p.id}', 1)">+</button>
+              </div>
+            </div>
+            <button class="check-circle" onclick="toggleCheck('${p.id}')">✓</button>
+          </div>
+        `;
+      });
+    }
+    content.innerHTML = html;
   }
 
-  function clearDone() {
-    items = items.filter(i => !i.done);
-    saveToStorage();
+  function changeQty(id, delta) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    p.qty = Math.max(0, p.qty + delta);
+    if (p.qty === 0) p.checked = false;
+    save();
+  }
+
+  function toggleCheck(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    p.checked = !p.checked;
+    save();
+  }
+
+  function toggleFilter() {
+    onlyNeeded = !onlyNeeded;
+    const btn = document.getElementById('filterBtn');
+    btn.classList.toggle('active', onlyNeeded);
+    render();
+  }
+
+  function resetList() {
+    if (!confirm('Tüm adetler ve tikler sıfırlanıp yeni liste başlatılsın mı? (Ürünler ve fotoğraflar silinmez)')) return;
+    products.forEach(p => { p.qty = 0; p.checked = false; });
+    onlyNeeded = false;
+    document.getElementById('filterBtn').classList.remove('active');
+    save();
   }
 
   function openModal(id = null) {
-    editId = id;
-    const item = id ? items.find(i => i.id === id) : null;
-    document.getElementById('modalTitle').innerText = item ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle';
-    document.getElementById('itemName').value = item ? item.name : '';
-    currentQty = item ? item.qty : 1;
-    currentImg = item ? item.img : null;
-    document.getElementById('qtyVal').innerText = currentQty;
-    document.getElementById('deleteBtn').style.display = item ? 'block' : 'none';
+    editingId = id;
+    const p = id ? products.find(x => x.id === id) : null;
+    
+    // Mevcut kategorileri öneri olarak doldur
+    const cats = [...new Set(products.map(x => x.category).filter(Boolean))];
+    document.getElementById('catSuggestions').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+
+    document.getElementById('modalTitle').innerText = p ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle';
+    document.getElementById('catInput').value = p ? p.category : (cats[0] || '');
+    document.getElementById('nameInput').value = p ? p.name : '';
+    tempImg = p ? p.img : null;
+    document.getElementById('delBtn').style.display = p ? 'block' : 'none';
+    
     updatePreview();
     document.getElementById('modal').classList.add('open');
   }
 
-  function closeModal() { document.getElementById('modal').classList.remove('open'); }
-
-  function changeQty(delta) {
-    currentQty = Math.max(1, currentQty + delta);
-    document.getElementById('qtyVal').innerText = currentQty;
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
   }
 
   function updatePreview() {
-    const box = document.getElementById('previewBox');
-    box.innerHTML = currentImg ? `<img src="${currentImg}">` : 'Fotoğraf Yok';
+    const box = document.getElementById('imgPreview');
+    box.innerHTML = tempImg ? `<img src="${tempImg}">` : 'Fotoğraf Eklemek İçin Aşağıdan Seçin';
   }
 
-  function handleImage(e) {
+  function processImg(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(event) {
+    reader.onload = function(ev) {
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const max = 400;
+        const max = 350;
         let w = img.width, h = img.height;
         if (w > h && w > max) { h *= max / w; w = max; }
         else if (h > max) { w *= max / h; h = max; }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        currentImg = canvas.toDataURL('image/jpeg', 0.6);
+        tempImg = canvas.toDataURL('image/jpeg', 0.65);
         updatePreview();
       };
-      img.src = event.target.result;
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  function saveItem() {
-    const name = document.getElementById('itemName').value.trim();
-    if (!name && !currentImg) { alert('Lütfen ürün adı veya fotoğraf ekleyin.'); return; }
-    if (editId) {
-      const item = items.find(i => i.id === editId);
-      item.name = name; item.qty = currentQty; item.img = currentImg;
+  function saveProduct() {
+    const cat = document.getElementById('catInput').value.trim() || 'GENEL';
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) { alert('Lütfen ürün adını yazın.'); return; }
+
+    if (editingId) {
+      const p = products.find(x => x.id === editingId);
+      p.category = cat;
+      p.name = name;
+      p.img = tempImg;
     } else {
-      items.unshift({ id: Date.now().toString(), name, qty: currentQty, img: currentImg, done: false });
+      products.push({
+        id: Date.now().toString(),
+        category: cat,
+        name: name,
+        qty: 0,
+        checked: false,
+        img: tempImg
+      });
     }
-    saveToStorage();
+    save();
     closeModal();
   }
 
-  function deleteCurrent() {
-    items = items.filter(i => i.id !== editId);
-    saveToStorage();
+  function deleteProduct() {
+    if (!confirm('Bu ürünü katalogdan tamamen silmek istediğinize emin misiniz?')) return;
+    products = products.filter(x => x.id !== editingId);
+    save();
     closeModal();
   }
 
