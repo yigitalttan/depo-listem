@@ -112,12 +112,18 @@
   .sheet-head h2 { margin: 0; font-size: 18px; }
   .link-btn { background: none; border: none; font-size: 16px; color: var(--blue); font-weight: 600; cursor: pointer; }
 
-  .preview-area { width: 100%; height: 150px; border-radius: 12px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; }
+  .preview-area { width: 100%; height: 145px; border-radius: 12px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; color: var(--sub); margin-bottom: 12px; overflow: hidden; position: relative; }
   .preview-area img { width: 100%; height: 100%; object-fit: contain; }
+  .clear-img-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid #555; border-radius: 8px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
   
-  .photo-row { display: flex; gap: 10px; margin-bottom: 14px; }
-  .photo-lbl { flex: 1; background: #2c2c2e; color: var(--blue); padding: 11px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid #3a3a3c; }
+  .photo-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .photo-lbl { flex: 1; background: #2c2c2e; color: var(--blue); padding: 10px 6px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid #3a3a3c; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .photo-lbl.web-search { background: #1a2a3a; color: #5ac8fa; border-color: #2c4a66; }
   input[type="file"] { display: none; }
+
+  .url-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .url-inp { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: white; font-size: 13px; -webkit-user-select: text; user-select: text; }
+  .url-apply-btn { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 0 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 
   .inp-group { margin-bottom: 12px; }
   .inp-group label { display: block; font-size: 11px; color: var(--sub); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
@@ -170,9 +176,16 @@
     </div>
 
     <div class="preview-area" id="imgPreview">Fotoğraf Seçilmedi</div>
+    
     <div class="photo-row">
-      <label class="photo-lbl">📷 Kamerayla Çek<input type="file" accept="image/*" capture="environment" onchange="processImg(event)"></label>
-      <label class="photo-lbl">🖼️ Galeriden Seç<input type="file" accept="image/*" onchange="processImg(event)"></label>
+      <label class="photo-lbl">📷 Kamera<input type="file" accept="image/*" capture="environment" onchange="processImg(event)"></label>
+      <label class="photo-lbl">🖼️ Galeri<input type="file" accept="image/*" onchange="processImg(event)"></label>
+      <button type="button" class="photo-lbl web-search" onclick="searchGoogleImages()">🔍 İnternette Ara</button>
+    </div>
+
+    <div class="url-row">
+      <input type="url" class="url-inp" id="imgUrlInput" placeholder="İnternetten kopyaladığınız resim linkini yapıştırın...">
+      <button type="button" class="url-apply-btn" onclick="applyImageUrl()">Ekle</button>
     </div>
 
     <div class="inp-group">
@@ -268,21 +281,21 @@
     { id: 'c4', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola PET 450 ml', unit: 'Paket' },
     { id: 'c5', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola Kutu 330 ml', unit: 'Koli' },
     { id: 'c6', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola Kutu (İnce / 250 ml)', unit: 'Koli' },
-    { id: 'c7', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola Cam Şişe 200 ml', unit: 'Kasa' },
+    { id: 'c7', category: 'KOLA, SPRİTE, FANTA', name: 'Coca-Cola Cam Şişe 200 ml', unit: 'Koli' },
     { id: 'c8', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 2,5 L', unit: 'Koli' },
     { id: 'c9', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 1,5 L', unit: 'Koli' },
     { id: 'c10', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta 1 L', unit: 'Koli' },
     { id: 'c11', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta PET 450 ml', unit: 'Paket' },
     { id: 'c12', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta Kutu 330 ml', unit: 'Koli' },
     { id: 'c13', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta Kutu (İnce / 250 ml)', unit: 'Koli' },
-    { id: 'c14', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta Cam Şişe 200 ml', unit: 'Kasa' },
+    { id: 'c14', category: 'KOLA, SPRİTE, FANTA', name: 'Fanta Cam Şişe 200 ml', unit: 'Koli' },
     { id: 'c15', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi 2,5 L', unit: 'Koli' },
     { id: 'c16', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi 1,5 L', unit: 'Koli' },
     { id: 'c17', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi 1 L', unit: 'Koli' },
     { id: 'c18', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi PET 450 ml', unit: 'Paket' },
     { id: 'c19', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi Kutu 330 ml', unit: 'Koli' },
     { id: 'c20', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi Kutu (İnce / 250 ml)', unit: 'Koli' },
-    { id: 'c21', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi Cam Şişe 200 ml', unit: 'Kasa' },
+    { id: 'c21', category: 'KOLA, SPRİTE, FANTA', name: 'Pepsi Cam Şişe 200 ml', unit: 'Koli' },
     { id: 'c22', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite 2,5 L', unit: 'Koli' },
     { id: 'c23', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite Kutu 330 ml', unit: 'Koli' },
     { id: 'c24', category: 'KOLA, SPRİTE, FANTA', name: 'Sprite Kutu (İnce / 250 ml)', unit: 'Koli' },
@@ -338,14 +351,11 @@
     { id: 'su1', category: 'SU & MADEN SUYU', name: 'Beypazarı Doğal Maden Suyu 200 ml', unit: 'Paket' }
   ];
 
-  // Mevcut kullanıcı kayıtlarını ve fotoğraflarını koruyarak yeni listeyi birleştir
   let savedProducts = JSON.parse(localStorage.getItem('depo_katalog_v2') || '[]');
   let products = [];
 
   if (savedProducts.length > 0) {
-    // Önce mevcut kayıtları al (fotoğraflar ve adetler korunsun)
     products = savedProducts.map(p => ({ unit: 'Adet', outOfStock: false, ...p }));
-    // Yeni katalogdaki ürünlerden henüz listede olmayanları ekle
     const existingNames = new Set(products.map(p => p.name.toLowerCase().trim()));
     catalogItems.forEach(item => {
       if (!existingNames.has(item.name.toLowerCase().trim())) {
@@ -354,7 +364,7 @@
           category: item.category,
           name: item.name,
           qty: 0,
-          unit: item.unit === 'Kasa' ? 'Koli' : item.unit,
+          unit: item.unit,
           checked: false,
           outOfStock: false,
           img: null
@@ -368,7 +378,7 @@
       category: item.category,
       name: item.name,
       qty: 0,
-      unit: item.unit === 'Kasa' ? 'Koli' : item.unit,
+      unit: item.unit,
       checked: false,
       outOfStock: false,
       img: null
@@ -456,7 +466,7 @@
         html += `
           <div class="card ${p.checked ? 'checked' : ''} ${p.outOfStock ? 'out-of-stock' : ''}" id="card-${p.id}">
             ${p.img 
-              ? `<img class="prod-img" src="${p.img}" onclick="openModal('${p.id}')">` 
+              ? `<img class="prod-img" src="${p.img}" onclick="openModal('${p.id}')" onerror="this.onerror=null; this.src=''; this.alt='Görsel Yüklenemedi';">` 
               : `<div class="prod-img" onclick="openModal('${p.id}')">Fotoğraf<br>Ekle</div>`}
             <div class="prod-mid">
               <div class="prod-name" onclick="openModal('${p.id}')">${p.name}</div>
@@ -480,7 +490,7 @@
     content.innerHTML = html;
   }
 
-  // Kaydırma (Scroll) Korumalı Akıllı Dokunma Kontrolü
+  // Kaydırma Korumalı Akıllı Dokunma Kontrolü
   const appContent = document.getElementById('appContent');
   let touchStartX = 0;
   let touchStartY = 0;
@@ -696,6 +706,7 @@
     document.getElementById('catInput').value = p ? p.category : (selectedCategory !== 'TÜMÜ' ? selectedCategory : (cats[0] || ''));
     document.getElementById('nameInput').value = p ? p.name : '';
     document.getElementById('unitInput').value = p ? (p.unit || 'Adet') : 'Adet';
+    document.getElementById('imgUrlInput').value = (p && p.img && p.img.startsWith('http')) ? p.img : '';
     tempImg = p ? p.img : null;
     
     document.getElementById('delBtn').style.display = p ? 'block' : 'none';
@@ -711,7 +722,43 @@
 
   function updatePreview() {
     const box = document.getElementById('imgPreview');
-    box.innerHTML = tempImg ? `<img src="${tempImg}">` : 'Fotoğraf Eklemek İçin Aşağıdan Seçin';
+    if (tempImg) {
+      box.innerHTML = `<img src="${tempImg}" onerror="alert('Bu resim bağlantısı açılamadı. Lütfen resmin kendisine basılı tutup Görüntü Bağlantısını Kopyala dediğinizden emin olun.');"><button type="button" class="clear-img-btn" onclick="clearTempImg()">Kaldır</button>`;
+    } else {
+      box.innerHTML = 'Fotoğraf Eklemek İçin Aşağıdan Seçin';
+    }
+  }
+
+  function clearTempImg() {
+    tempImg = null;
+    document.getElementById('imgUrlInput').value = '';
+    updatePreview();
+  }
+
+  // İnternette Google Görsellerde Ara
+  function searchGoogleImages() {
+    const prodName = document.getElementById('nameInput').value.trim();
+    if (!prodName) {
+      alert('Önce aşağıya ürün adını yazın, ardından İnternette Ara butonuna basın.');
+      return;
+    }
+    const query = encodeURIComponent(prodName);
+    window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
+  }
+
+  // İnternetten Kopyalanan Görsel Linkini Uygula
+  function applyImageUrl() {
+    const url = document.getElementById('imgUrlInput').value.trim();
+    if (!url) {
+      alert('Lütfen önce resim bağlantısını kutuya yapıştırın.');
+      return;
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      alert('Lütfen geçerli bir internet bağlantısı (https://...) yapıştırın.');
+      return;
+    }
+    tempImg = url;
+    updatePreview();
   }
 
   function processImg(e) {
@@ -729,6 +776,7 @@
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         tempImg = canvas.toDataURL('image/jpeg', 0.6);
+        document.getElementById('imgUrlInput').value = '';
         updatePreview();
       };
       img.src = ev.target.result;
@@ -740,6 +788,12 @@
     const cat = document.getElementById('catInput').value.trim() || 'GENEL';
     const name = document.getElementById('nameInput').value.trim();
     const unit = document.getElementById('unitInput').value;
+    
+    const rawUrl = document.getElementById('imgUrlInput').value.trim();
+    if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
+      tempImg = rawUrl;
+    }
+
     if (!name) { alert('Lütfen ürün adını yazın.'); return; }
 
     if (editingId) {
